@@ -2,146 +2,388 @@
 <html lang="bg">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
 
   <title>Каса – 4 група</title>
 
   <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #718096;
+      --border: #e8edf3;
+      --primary: #4f6bed;
+      --primary-light: #eef1ff;
+      --green: #16865b;
+      --green-light: #e9f8f1;
+      --orange: #d97706;
+      --orange-light: #fff4df;
+      --shadow: 0 8px 30px rgba(35, 50, 80, 0.08);
+    }
+
     * {
       box-sizing: border-box;
     }
 
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #1f2937;
+      padding: 0;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .container {
+    .page {
+      width: 100%;
       max-width: 1100px;
       margin: 0 auto;
-      padding: 30px 20px 50px;
+      padding:
+        max(24px, env(safe-area-inset-top))
+        20px
+        max(40px, env(safe-area-inset-bottom));
     }
 
-    header {
-      margin-bottom: 25px;
+    /* HEADER */
+
+    .header {
+      padding: 18px 4px 24px;
     }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 32px;
-    }
-
-    .subtitle {
-      color: #6b7280;
+    .header-title {
       margin: 0;
+      font-size: clamp(28px, 5vw, 38px);
+      line-height: 1.15;
+      font-weight: 750;
+      letter-spacing: -0.8px;
     }
 
-    .cards {
+    .header-subtitle {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* SUMMARY */
+
+    .summary {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 25px;
+      gap: 14px;
+      margin-bottom: 18px;
     }
 
-    .card {
-      background: white;
-      border-radius: 16px;
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
       padding: 20px;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+      box-shadow: var(--shadow);
+      min-width: 0;
     }
 
-    .card-title {
-      color: #6b7280;
+    .summary-label {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-bottom: 9px;
+    }
+
+    .summary-value {
+      font-size: clamp(21px, 3vw, 28px);
+      line-height: 1.2;
+      font-weight: 750;
+      letter-spacing: -0.4px;
+      white-space: nowrap;
+    }
+
+    .balance-card {
+      background: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #f4f6ff 100%
+      );
+    }
+
+    .balance-card .summary-value {
+      color: var(--primary);
+    }
+
+    /* FEES */
+
+    .fees-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 22px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .fees-left {
+      min-width: 0;
+    }
+
+    .fees-title {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .fees-subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
       font-size: 14px;
-      margin-bottom: 10px;
     }
 
-    .card-value {
-      font-size: 25px;
-      font-weight: bold;
+    .fees-number {
+      flex-shrink: 0;
+      min-width: 88px;
+      text-align: center;
+      background: var(--green-light);
+      color: var(--green);
+      border-radius: 16px;
+      padding: 12px 15px;
+      font-size: 22px;
+      font-weight: 800;
     }
 
-    .paid {
-      margin-bottom: 25px;
-    }
+    /* SECTION */
 
     .section {
-      background: white;
-      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
       padding: 22px;
-      margin-bottom: 25px;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
-      overflow-x: auto;
+      box-shadow: var(--shadow);
     }
 
-    h2 {
-      margin-top: 0;
-      margin-bottom: 18px;
-      font-size: 22px;
+    .section-title {
+      margin: 0 0 18px;
+      font-size: 21px;
+      font-weight: 750;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 650px;
+    /* EXPENSES */
+
+    .expense-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    th,
-    td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #e5e7eb;
-      text-align: left;
+    .expense {
+      display: grid;
+      grid-template-columns: 105px 1fr auto;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 16px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: #fbfcfe;
     }
 
-    th {
-      background: #f9fafb;
-      font-weight: bold;
+    .expense-date {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
     }
 
-    td.amount,
-    th.amount {
+    .expense-reason {
+      font-size: 15px;
+      font-weight: 600;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .expense-amount {
+      color: var(--orange);
+      font-size: 15px;
+      font-weight: 750;
+      white-space: nowrap;
       text-align: right;
     }
 
     .empty {
-      color: #6b7280;
-      padding: 15px 0;
+      color: var(--muted);
+      text-align: center;
+      padding: 25px 10px;
     }
+
+    /* FOOTER */
 
     footer {
       text-align: center;
-      color: #6b7280;
-      font-size: 13px;
-      margin-top: 30px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 24px 10px 0;
     }
+
+    /* ERROR */
 
     .error {
       background: #fff1f2;
-      color: #991b1b;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
+      color: #9f1239;
+      border: 1px solid #fecdd3;
+      border-radius: 16px;
+      padding: 18px;
+      line-height: 1.5;
     }
 
-    @media (max-width: 800px) {
-      .cards {
+    /* TABLET */
+
+    @media (max-width: 850px) {
+
+      .summary {
         grid-template-columns: repeat(2, 1fr);
       }
+
+      .expense {
+        grid-template-columns: 95px 1fr auto;
+      }
     }
 
-    @media (max-width: 500px) {
-      .cards {
-        grid-template-columns: 1fr;
+    /* PHONE */
+
+    @media (max-width: 600px) {
+
+      .page {
+        padding-left: 14px;
+        padding-right: 14px;
       }
 
-      h1 {
-        font-size: 27px;
+      .header {
+        padding-top: 10px;
+        padding-bottom: 18px;
       }
 
-      .container {
-        padding: 20px 12px 40px;
+      .header-title {
+        font-size: 29px;
+      }
+
+      .header-subtitle {
+        font-size: 14px;
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .summary-card {
+        padding: 16px 14px;
+        border-radius: 17px;
+      }
+
+      .summary-label {
+        font-size: 12px;
+      }
+
+      .summary-value {
+        font-size: 20px;
+      }
+
+      .fees-card {
+        padding: 17px;
+        border-radius: 17px;
+      }
+
+      .fees-title {
+        font-size: 17px;
+      }
+
+      .fees-subtitle {
+        font-size: 13px;
+      }
+
+      .fees-number {
+        min-width: 76px;
+        padding: 10px 9px;
+        font-size: 20px;
+        border-radius: 14px;
+      }
+
+      .section {
+        padding: 17px 14px;
+        border-radius: 17px;
+      }
+
+      .section-title {
+        font-size: 19px;
+        margin-bottom: 14px;
+      }
+
+      .expense {
+        grid-template-columns: 1fr auto;
+        gap: 6px 12px;
+        padding: 14px;
+        border-radius: 14px;
+      }
+
+      .expense-date {
+        grid-column: 1;
+        grid-row: 1;
+        font-size: 12px;
+      }
+
+      .expense-amount {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
+        font-size: 14px;
+      }
+
+      .expense-reason {
+        grid-column: 1;
+        grid-row: 2;
+        font-size: 14px;
+      }
+    }
+
+    /* VERY SMALL PHONES */
+
+    @media (max-width: 380px) {
+
+      .page {
+        padding-left: 11px;
+        padding-right: 11px;
+      }
+
+      .summary-card {
+        padding: 14px 11px;
+      }
+
+      .summary-value {
+        font-size: 18px;
+      }
+
+      .fees-card {
+        gap: 10px;
+      }
+
+      .fees-number {
+        min-width: 70px;
       }
     }
   </style>
@@ -149,22 +391,29 @@
 
 <body>
 
-<div class="container">
+<div class="page">
 
-  <header>
-    <h1>Каса – 4 група</h1>
-    <p class="subtitle">Информационна таблица · само за преглед</p>
+  <header class="header">
+    <h1 class="header-title">Каса – 4 група</h1>
+
+    <p class="header-subtitle">
+      Информационна таблица · само за преглед
+    </p>
   </header>
 
-  <div id="content">
+
+  <main id="content">
     Зареждане на данните...
-  </div>
+  </main>
+
 
   <footer>
-    Страницата е само за преглед. Посетителите не могат да редактират таблицата.
+    Страницата е само за преглед.
+    Посетителите не могат да редактират таблицата.
   </footer>
 
 </div>
+
 
 <script>
 
@@ -172,13 +421,14 @@ const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSKH2WDdHEv8bgN3Ck4sB_oUSGuOasU5avE2DDTxbQcebIUgoOBLIsIpA7_VHfK2g/pub?gid=1968436123&single=true&output=csv";
 
 
-/* -------------------------------------------------------
-   CSV READER
-------------------------------------------------------- */
+/* ======================================================
+   CSV
+====================================================== */
 
 function parseCSV(text) {
 
   const rows = [];
+
   let row = [];
   let cell = "";
   let insideQuotes = false;
@@ -202,24 +452,20 @@ function parseCSV(text) {
       row.push(cell);
       cell = "";
 
-    } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+    } else if (
+      (char === "\n" || char === "\r") &&
+      !insideQuotes
+    ) {
 
       if (char === "\r" && next === "\n") {
         i++;
       }
 
       row.push(cell);
-      cell = "";
-
-      /*
-        ВАЖНО:
-        Тук НЕ махаме празните редове.
-        Така структурата на Google Sheet
-        остава точно същата.
-      */
-
       rows.push(row);
+
       row = [];
+      cell = "";
 
     } else {
 
@@ -236,9 +482,9 @@ function parseCSV(text) {
 }
 
 
-/* -------------------------------------------------------
+/* ======================================================
    HELPERS
-------------------------------------------------------- */
+====================================================== */
 
 function clean(value) {
 
@@ -257,7 +503,11 @@ function normalize(value) {
 
 function numberValue(value) {
 
-  if (value === null || value === undefined) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
     return 0;
   }
 
@@ -265,18 +515,6 @@ function numberValue(value) {
     .replace(/€/g, "")
     .replace(/\s/g, "")
     .trim();
-
-  if (!text) {
-    return 0;
-  }
-
-  /*
-    Поддържа:
-    50
-    50,00
-    50.00
-    1.234,56
-  */
 
   if (text.includes(",") && text.includes(".")) {
 
@@ -291,7 +529,9 @@ function numberValue(value) {
 
   const result = parseFloat(text);
 
-  return Number.isFinite(result) ? result : 0;
+  return Number.isFinite(result)
+    ? result
+    : 0;
 }
 
 
@@ -304,10 +544,6 @@ function euro(value) {
 }
 
 
-/* -------------------------------------------------------
-   FIND ROW / COLUMN
-------------------------------------------------------- */
-
 function findRowByText(rows, text) {
 
   const wanted = normalize(text);
@@ -316,7 +552,9 @@ function findRowByText(rows, text) {
 
     for (let j = 0; j < rows[i].length; j++) {
 
-      if (normalize(rows[i][j]) === wanted) {
+      if (
+        normalize(rows[i][j]) === wanted
+      ) {
         return i;
       }
     }
@@ -334,7 +572,9 @@ function findColumn(headers, possibleNames) {
 
     for (const name of possibleNames) {
 
-      if (current === normalize(name)) {
+      if (
+        current === normalize(name)
+      ) {
         return i;
       }
     }
@@ -344,13 +584,14 @@ function findColumn(headers, possibleNames) {
 }
 
 
-/* -------------------------------------------------------
-   MAIN
-------------------------------------------------------- */
+/* ======================================================
+   LOAD DATA
+====================================================== */
 
 async function loadData() {
 
-  const content = document.getElementById("content");
+  const content =
+    document.getElementById("content");
 
   try {
 
@@ -359,38 +600,41 @@ async function loadData() {
     );
 
     if (!response.ok) {
-      throw new Error("Google Sheets не може да бъде зареден.");
+      throw new Error(
+        "Google Sheets не може да бъде зареден."
+      );
     }
 
-    const csvText = await response.text();
+    const csvText =
+      await response.text();
 
-    const rows = parseCSV(csvText);
+    const rows =
+      parseCSV(csvText);
 
 
-    /* ---------------------------------------------------
+    /* ==================================================
        SUMMARY
-
-       B3 = наличност от миналата година
-    --------------------------------------------------- */
+    ================================================== */
 
     const openingBalance =
-      numberValue(rows[2]?.[1]);
+      numberValue(
+        rows[2]?.[1]
+      );
 
 
-    /* ---------------------------------------------------
-       FIND INCOME HEADER ROW
-
-       Търсим:
-       "Дата на приход"
-    --------------------------------------------------- */
+    /* ==================================================
+       INCOME HEADER
+    ================================================== */
 
     const incomeHeaderRow =
-      findRowByText(rows, "Дата на приход");
-
+      findRowByText(
+        rows,
+        "Дата на приход"
+      );
 
     if (incomeHeaderRow === -1) {
       throw new Error(
-        "Не е намерен редът с приходите."
+        "Не е намерена секцията с приходите."
       );
     }
 
@@ -434,20 +678,20 @@ async function loadData() {
       );
 
 
-    /* ---------------------------------------------------
-       FIND EXPENSE HEADER ROW
-
-       Търсим:
-       "Дата на разход"
-    --------------------------------------------------- */
+    /* ==================================================
+       EXPENSE HEADER
+    ================================================== */
 
     const expenseHeaderRow =
-      findRowByText(rows, "Дата на разход");
+      findRowByText(
+        rows,
+        "Дата на разход"
+      );
 
 
     if (expenseHeaderRow === -1) {
       throw new Error(
-        "Не е намерен редът с разходите."
+        "Не е намерена секцията с разходите."
       );
     }
 
@@ -477,21 +721,19 @@ async function loadData() {
       );
 
 
-    /* ---------------------------------------------------
-       INCOMES
-    --------------------------------------------------- */
+    /* ==================================================
+       INCOME CALCULATION
 
-    const incomes = [];
+       Приходите са само за изчисляване
+       на общата сума.
+
+       НЕ ги показваме на сайта.
+    ================================================== */
 
     let incomeTotal = 0;
 
+    const incomes = [];
 
-    /*
-      Започваме от реда СЛЕД заглавието.
-      Четем до края на таблицата.
-
-      Празните редове не пречат.
-    */
 
     for (
       let i = incomeHeaderRow + 1;
@@ -505,27 +747,18 @@ async function loadData() {
       const date =
         clean(row[incomeDateCol]);
 
-
       const description =
         clean(row[incomeDescriptionCol]);
-
 
       const amount =
         numberValue(row[incomeAmountCol]);
 
-
       const payment =
         clean(row[paymentMethodCol]);
-
 
       const status =
         clean(row[statusCol]);
 
-
-      /*
-        Ако редът е напълно празен,
-        не го добавяме.
-      */
 
       if (
         !date &&
@@ -539,26 +772,24 @@ async function loadData() {
 
 
       /*
-        Спираме, ако случайно стигнем
-        до началото на друга секция.
+        Само реалните редове
+        с Платена / Неплатена
+        участват в броя на децата.
       */
 
       if (
-        normalize(date) === "дата на разход"
+        normalize(status) === "платена" ||
+        normalize(status) === "неплатена"
       ) {
-        break;
+
+        incomes.push({
+          date,
+          description,
+          amount,
+          payment,
+          status
+        });
       }
-
-
-      incomes.push({
-
-        date,
-        description,
-        amount,
-        payment,
-        status
-
-      });
 
 
       if (amount !== 0) {
@@ -567,9 +798,31 @@ async function loadData() {
     }
 
 
-    /* ---------------------------------------------------
+    /* ==================================================
+       PAID COUNT
+
+       Тук броим само:
+       Платена
+       Неплатена
+
+       "В брой" не влияе.
+       "Банков превод" не влияе.
+    ================================================== */
+
+    const paidCount =
+      incomes.filter(
+        item =>
+          normalize(item.status) === "платена"
+      ).length;
+
+
+    const totalPeople =
+      incomes.length;
+
+
+    /* ==================================================
        EXPENSES
-    --------------------------------------------------- */
+    ================================================== */
 
     const expenses = [];
 
@@ -588,10 +841,8 @@ async function loadData() {
       const date =
         clean(row[expenseDateCol]);
 
-
       const reason =
         clean(row[expenseReasonCol]);
-
 
       const amount =
         numberValue(row[expenseAmountCol]);
@@ -607,11 +858,9 @@ async function loadData() {
 
 
       expenses.push({
-
         date,
         reason,
         amount
-
       });
 
 
@@ -621,14 +870,9 @@ async function loadData() {
     }
 
 
-    /* ---------------------------------------------------
+    /* ==================================================
        BALANCE
-
-       Наличност =
-       стара наличност
-       + приходи
-       - разходи
-    --------------------------------------------------- */
+    ================================================== */
 
     const balance =
       openingBalance +
@@ -636,220 +880,98 @@ async function loadData() {
       expenseTotal;
 
 
-    /* ---------------------------------------------------
-       PAID / TOTAL
-
-       БРОИМ САМО СТАТУСИТЕ.
-
-       "Платена" = платил
-       "Неплатена" = не е платил
-
-       Начинът на плащане НЕ влияе.
-    --------------------------------------------------- */
-
-    const paidCount =
-      incomes.filter(
-        item =>
-          normalize(item.status) === "платена"
-      ).length;
-
-
-    const totalPeople =
-      incomes.filter(
-        item =>
-          normalize(item.status) === "платена" ||
-          normalize(item.status) === "неплатена"
-      ).length;
-
-
-    /* ---------------------------------------------------
-       HTML
-    --------------------------------------------------- */
+    /* ==================================================
+       DISPLAY
+    ================================================== */
 
     let html = "";
 
 
-    /* CARDS */
+    /* SUMMARY */
 
     html += `
 
-      <div class="cards">
+      <section class="summary">
 
-        <div class="card">
+        <div class="summary-card">
 
-          <div class="card-title">
+          <div class="summary-label">
             🏦 Наличност от миналата година
           </div>
 
-          <div class="card-value">
+          <div class="summary-value">
             ${euro(openingBalance)}
           </div>
 
         </div>
 
 
-        <div class="card">
+        <div class="summary-card">
 
-          <div class="card-title">
+          <div class="summary-label">
             💰 Общо приходи
           </div>
 
-          <div class="card-value">
+          <div class="summary-value">
             ${euro(incomeTotal)}
           </div>
 
         </div>
 
 
-        <div class="card">
+        <div class="summary-card">
 
-          <div class="card-title">
+          <div class="summary-label">
             🧾 Общо разходи
           </div>
 
-          <div class="card-value">
+          <div class="summary-value">
             ${euro(expenseTotal)}
           </div>
 
         </div>
 
 
-        <div class="card">
+        <div class="summary-card balance-card">
 
-          <div class="card-title">
+          <div class="summary-label">
             💶 Наличност
           </div>
 
-          <div class="card-value">
+          <div class="summary-value">
             ${euro(balance)}
           </div>
 
         </div>
 
-      </div>
+      </section>
     `;
 
 
-    /* PAID */
+    /* FEES */
 
     html += `
 
-      <div class="section paid">
+      <section class="fees-card">
 
-        <h2>
-          👨‍👩‍👧‍👦 Такси
-        </h2>
+        <div class="fees-left">
 
-        <div class="card-value">
-          ${paidCount}/${totalPeople} платили
+          <h2 class="fees-title">
+            👨‍👩‍👧‍👦 Такси
+          </h2>
+
+          <p class="fees-subtitle">
+            Платили от общия брой
+          </p>
+
         </div>
 
-      </div>
 
-    `;
+        <div class="fees-number">
+          ${paidCount}/${totalPeople}
+        </div>
 
-
-    /* INCOMES */
-
-    html += `
-
-      <div class="section">
-
-        <h2>
-          Приходи
-        </h2>
-
-        ${
-          incomes.length === 0
-
-          ?
-
-          `
-            <div class="empty">
-              Няма въведени приходи.
-            </div>
-          `
-
-          :
-
-          `
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>
-                    Дата
-                  </th>
-
-                  <th>
-                    Описание
-                  </th>
-
-                  <th class="amount">
-                    Приход
-                  </th>
-
-                  <th>
-                    Начин на плащане
-                  </th>
-
-                  <th>
-                    Статус
-                  </th>
-
-                </tr>
-
-              </thead>
-
-
-              <tbody>
-
-                ${
-                  incomes.map(item => `
-
-                    <tr>
-
-                      <td>
-                        ${item.date}
-                      </td>
-
-                      <td>
-                        ${item.description}
-                      </td>
-
-                      <td class="amount">
-                        ${
-                          item.amount
-                            ? euro(item.amount)
-                            : ""
-                        }
-                      </td>
-
-                      <td>
-                        ${item.payment}
-                      </td>
-
-                      <td>
-                        ${item.status}
-                      </td>
-
-                    </tr>
-
-                  `).join("")
-                }
-
-              </tbody>
-
-            </table>
-
-          `
-        }
-
-      </div>
-
+      </section>
     `;
 
 
@@ -857,9 +979,9 @@ async function loadData() {
 
     html += `
 
-      <div class="section">
+      <section class="section">
 
-        <h2>
+        <h2 class="section-title">
           Разходи
         </h2>
 
@@ -878,66 +1000,40 @@ async function loadData() {
 
           `
 
-            <table>
+            <div class="expense-list">
 
-              <thead>
+              ${
+                expenses.map(item => `
 
-                <tr>
+                  <div class="expense">
 
-                  <th>
-                    Дата
-                  </th>
+                    <div class="expense-date">
+                      ${item.date}
+                    </div>
 
-                  <th>
-                    Основание
-                  </th>
+                    <div class="expense-reason">
+                      ${item.reason}
+                    </div>
 
-                  <th class="amount">
-                    Разход
-                  </th>
+                    <div class="expense-amount">
+                      ${
+                        item.amount
+                          ? euro(item.amount)
+                          : ""
+                      }
+                    </div>
 
-                </tr>
+                  </div>
 
-              </thead>
+                `).join("")
+              }
 
-
-              <tbody>
-
-                ${
-                  expenses.map(item => `
-
-                    <tr>
-
-                      <td>
-                        ${item.date}
-                      </td>
-
-                      <td>
-                        ${item.reason}
-                      </td>
-
-                      <td class="amount">
-                        ${
-                          item.amount
-                            ? euro(item.amount)
-                            : ""
-                        }
-                      </td>
-
-                    </tr>
-
-                  `).join("")
-                }
-
-              </tbody>
-
-            </table>
+            </div>
 
           `
         }
 
-      </div>
-
+      </section>
     `;
 
 
@@ -961,13 +1057,14 @@ async function loadData() {
         е публикуван в мрежата.
 
       </div>
-
     `;
   }
 }
 
 
-/* START */
+/* ======================================================
+   START
+====================================================== */
 
 loadData();
 
