@@ -1,1 +1,131 @@
-<!DOCTYPE html> <html lang="bg"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Каса – 4 група</title> <style> body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; color: #222; } .container { max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); } h1 { margin-top: 0; text-align: center; } .subtitle { text-align: center; color: #777; margin-bottom: 30px; } .total-box { background: #f0f7ff; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 30px; } .total-box .label { font-size: 18px; color: #555; } .total-box .value { font-size: 32px; font-weight: bold; margin-top: 8px; } h2 { margin-top: 25px; } table { width: 100%; border-collapse: collapse; margin-top: 15px; } th, td { padding: 12px 10px; border-bottom: 1px solid #ddd; } th { text-align: left; background: #f7f7f7; } th:last-child, td:last-child { text-align: right; } .summary { display: flex; justify-content: space-between; padding: 15px 10px; margin-top: 10px; font-weight: bold; border-top: 2px solid #222; } .available { margin-top: 30px; padding: 25px; background: #eef8ee; border-radius: 10px; text-align: center; } .available .label { font-size: 20px; } .available .value { font-size: 38px; font-weight: bold; margin-top: 8px; } .footer { margin-top: 30px; text-align: center; color: #888; font-size: 14px; } </style> </head> <body> <div class="container"> <h1>Каса – 4 група</h1> <div class="subtitle"> Информационна таблица · само за преглед </div> <div class="total-box"> <div class="label">Общо приходи</div> <div class="value" id="totalIncome">0,00 €</div> </div> <h2>Разходи</h2> <table> <thead> <tr> <th>Основание</th> <th>Сума</th> </tr> </thead> <tbody id="expenseTable"></tbody> </table> <div class="summary"> <span>Общо разходи</span> <span id="totalExpense">0,00 €</span> </div> <div class="available"> <div class="label">Налични</div> <div class="value" id="available">0,00 €</div> </div> <div class="footer"> Страницата е само за преглед. Посетителите не могат да редактират таблицата. </div> </div> <script> // Данни от Excel const rows = [ { number: 1, income: 0, expense: 67.50, description: "застраховки" }, { number: 2, income: 0, expense: 0, description: "" }, { number: 3, income: 0, expense: 0, description: "" }, { number: 4, income: 50.00, expense: 0, description: "" }, { number: 5, income: 0, expense: 0, description: "" }, { number: 6, income: 50.00, expense: 0, description: "" }, { number: 7, income: 0, expense: 0, description: "" }, { number: 8, income: 50.00, expense: 0, description: "" }, { number: 9, income: 50.00, expense: 0, description: "" }, { number: 10, income: 0, expense: 0, description: "" }, { number: 11, income: 0, expense: 0, description: "" }, { number: 12, income: 0, expense: 0, description: "" }, { number: 13, income: 50.00, expense: 0, description: "" }, { number: 14, income: 50.00, expense: 0, description: "" }, { number: 15, income: 0, expense: 0, description: "" }, { number: 16, income: 0, expense: 0, description: "" }, { number: 17, income: 0, expense: 0, description: "" }, { number: 18, income: 50.00, expense: 0, description: "" }, { number: 19, income: 50.00, expense: 0, description: "" }, { number: 20, income: 0, expense: 0, description: "" }, { number: 21, income: 0, expense: 0, description: "" }, { number: 22, income: 0, expense: 0, description: "" }, { number: 23, income: 0, expense: 0, description: "" }, { number: 24, income: 0, expense: 0, description: "" }, { number: 25, income: 50.00, expense: 0, description: "" }, { number: 26, income: 0, expense: 0, description: "" }, { number: 27, income: 50.00, expense: 0, description: "" }, { number: 28, income: 50.00, expense: 0, description: "" }, { number: 29, income: 0, expense: 0, description: "" }, { number: 30, income: 0, expense: 0, description: "" }, { number: 31, income: 139.31, expense: 0, description: "" } ]; function money(value) { return new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value) + " €"; } // Общо приходи const totalIncome = rows.reduce( (sum, row) => sum + Number(row.income || 0), 0 ); // Общо разходи const totalExpense = rows.reduce( (sum, row) => sum + Number(row.expense || 0), 0 ); // Налични const available = totalIncome - totalExpense; // Показване на приходите document.getElementById("totalIncome").textContent = money(totalIncome); // Показване на разходите const expenseTable = document.getElementById("expenseTable"); rows .filter(row => Number(row.expense || 0) !== 0) .forEach(row => { const tr = document.createElement("tr"); const description = document.createElement("td"); description.textContent = row.description || "Без описание"; const amount = document.createElement("td"); amount.textContent = money(row.expense); tr.appendChild(description); tr.appendChild(amount); expenseTable.appendChild(tr); }); // Общо разходи document.getElementById("totalExpense").textContent = money(totalExpense); // Налични document.getElementById("available").textContent = money(available); </script> </body> </html>
+```html
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Каса – 4 група</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-top: 6px;
+      margin-bottom: 30px;
+    }
+
+    .income {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .income-title {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .income-value {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    h2 {
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #f7f7f7;
+      text-align: left;
+    }
+
+    th:last-child,
+    td:last-child {
+      text-align: right;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      border-top: 2px solid #222;
+      margin-top: 10px;
+      padding: 15px 10px;
+    }
+
+    .available {
+      margin-top: 30px;
+      padding: 25px;
+      background: #eef8ee;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .available-title {
+      font-size: 20px;
+    }
+
+    .available-value {
+      font-size: 40px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Каса – 4 група</h1>
+
+  <div class="subtitle">
+    Информационна таблица · само за преглед
+  </div>
+
+  <!-- B35 – ОБЩО ПРИХОДИ -->
+  <div class="income">
+    <div class="income
+```
