@@ -42,14 +42,14 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 15px;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     .card {
       background: white;
       border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
     }
 
     .card-title {
@@ -64,7 +64,7 @@
     }
 
     .paid {
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     .section {
@@ -72,7 +72,7 @@
       border-radius: 16px;
       padding: 22px;
       margin-bottom: 25px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
       overflow-x: auto;
     }
 
@@ -171,80 +171,182 @@
 const CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSKH2WDdHEv8bgN3Ck4sB_oUSGuOasU5avE2DDTxbQcebIUgoOBLIsIpA7_VHfK2g/pub?gid=1968436123&single=true&output=csv";
 
+
+/* -------------------------------------------------------
+   CSV READER
+------------------------------------------------------- */
+
 function parseCSV(text) {
+
   const rows = [];
   let row = [];
   let cell = "";
   let insideQuotes = false;
 
   for (let i = 0; i < text.length; i++) {
+
     const char = text[i];
     const next = text[i + 1];
 
     if (char === '"' && insideQuotes && next === '"') {
+
       cell += '"';
       i++;
+
     } else if (char === '"') {
+
       insideQuotes = !insideQuotes;
+
     } else if (char === "," && !insideQuotes) {
+
       row.push(cell);
       cell = "";
+
     } else if ((char === "\n" || char === "\r") && !insideQuotes) {
-      if (char === "\r" && next === "\n") i++;
 
-      row.push(cell);
-      cell = "";
-
-      if (row.some(value => value.trim() !== "")) {
-        rows.push(row);
+      if (char === "\r" && next === "\n") {
+        i++;
       }
 
+      row.push(cell);
+      cell = "";
+
+      /*
+        ВАЖНО:
+        Тук НЕ махаме празните редове.
+        Така структурата на Google Sheet
+        остава точно същата.
+      */
+
+      rows.push(row);
       row = [];
+
     } else {
+
       cell += char;
     }
   }
 
   if (cell !== "" || row.length > 0) {
     row.push(cell);
-
-    if (row.some(value => value.trim() !== "")) {
-      rows.push(row);
-    }
+    rows.push(row);
   }
 
   return rows;
 }
 
+
+/* -------------------------------------------------------
+   HELPERS
+------------------------------------------------------- */
+
+function clean(value) {
+
+  return String(value ?? "").trim();
+}
+
+
+function normalize(value) {
+
+  return clean(value)
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+
 function numberValue(value) {
-  if (!value) return 0;
+
+  if (value === null || value === undefined) {
+    return 0;
+  }
 
   let text = String(value)
     .replace(/€/g, "")
     .replace(/\s/g, "")
     .trim();
 
+  if (!text) {
+    return 0;
+  }
+
+  /*
+    Поддържа:
+    50
+    50,00
+    50.00
+    1.234,56
+  */
+
   if (text.includes(",") && text.includes(".")) {
-    text = text.replace(/\./g, "").replace(",", ".");
+
+    text = text
+      .replace(/\./g, "")
+      .replace(",", ".");
+
   } else {
+
     text = text.replace(",", ".");
   }
 
-  const number = parseFloat(text);
+  const result = parseFloat(text);
 
-  return isNaN(number) ? 0 : number;
+  return Number.isFinite(result) ? result : 0;
 }
 
+
 function euro(value) {
+
   return new Intl.NumberFormat("bg-BG", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(value) + " €";
 }
 
-function clean(value) {
-  return (value || "").trim();
+
+/* -------------------------------------------------------
+   FIND ROW / COLUMN
+------------------------------------------------------- */
+
+function findRowByText(rows, text) {
+
+  const wanted = normalize(text);
+
+  for (let i = 0; i < rows.length; i++) {
+
+    for (let j = 0; j < rows[i].length; j++) {
+
+      if (normalize(rows[i][j]) === wanted) {
+        return i;
+      }
+    }
+  }
+
+  return -1;
 }
+
+
+function findColumn(headers, possibleNames) {
+
+  for (let i = 0; i < headers.length; i++) {
+
+    const current = normalize(headers[i]);
+
+    for (const name of possibleNames) {
+
+      if (current === normalize(name)) {
+        return i;
+      }
+    }
+  }
+
+  return -1;
+}
+
+
+/* -------------------------------------------------------
+   MAIN
+------------------------------------------------------- */
 
 async function loadData() {
 
@@ -252,219 +354,620 @@ async function loadData() {
 
   try {
 
-    const response = await fetch(CSV_URL + "&v=" + Date.now());
+    const response = await fetch(
+      CSV_URL + "&v=" + Date.now()
+    );
 
     if (!response.ok) {
       throw new Error("Google Sheets не може да бъде зареден.");
     }
 
-    const text = await response.text();
-    const rows = parseCSV(text);
+    const csvText = await response.text();
 
-    /*
-      Google Sheet:
-      B3 = наличност от миналата година
-      B4 = общо приходи
-      B5 = общо разходи
-      B6 = наличност
+    const rows = parseCSV(csvText);
 
-      A14:E43 = приходи
-      G14:I44 = разходи
-    */
 
-    const openingBalance = numberValue(rows[2]?.[1]);
+    /* ---------------------------------------------------
+       SUMMARY
 
-    let incomeTotal = 0;
-    let expenseTotal = 0;
+       B3 = наличност от миналата година
+    --------------------------------------------------- */
+
+    const openingBalance =
+      numberValue(rows[2]?.[1]);
+
+
+    /* ---------------------------------------------------
+       FIND INCOME HEADER ROW
+
+       Търсим:
+       "Дата на приход"
+    --------------------------------------------------- */
+
+    const incomeHeaderRow =
+      findRowByText(rows, "Дата на приход");
+
+
+    if (incomeHeaderRow === -1) {
+      throw new Error(
+        "Не е намерен редът с приходите."
+      );
+    }
+
+
+    const incomeHeaders =
+      rows[incomeHeaderRow];
+
+
+    const incomeDateCol =
+      findColumn(
+        incomeHeaders,
+        ["Дата на приход"]
+      );
+
+
+    const incomeDescriptionCol =
+      findColumn(
+        incomeHeaders,
+        ["Описание на прихода"]
+      );
+
+
+    const incomeAmountCol =
+      findColumn(
+        incomeHeaders,
+        ["Приход €", "Приход"]
+      );
+
+
+    const paymentMethodCol =
+      findColumn(
+        incomeHeaders,
+        ["Начин на плащане"]
+      );
+
+
+    const statusCol =
+      findColumn(
+        incomeHeaders,
+        ["Статус"]
+      );
+
+
+    /* ---------------------------------------------------
+       FIND EXPENSE HEADER ROW
+
+       Търсим:
+       "Дата на разход"
+    --------------------------------------------------- */
+
+    const expenseHeaderRow =
+      findRowByText(rows, "Дата на разход");
+
+
+    if (expenseHeaderRow === -1) {
+      throw new Error(
+        "Не е намерен редът с разходите."
+      );
+    }
+
+
+    const expenseHeaders =
+      rows[expenseHeaderRow];
+
+
+    const expenseDateCol =
+      findColumn(
+        expenseHeaders,
+        ["Дата на разход"]
+      );
+
+
+    const expenseReasonCol =
+      findColumn(
+        expenseHeaders,
+        ["Основание за разход"]
+      );
+
+
+    const expenseAmountCol =
+      findColumn(
+        expenseHeaders,
+        ["Разход €", "Разход"]
+      );
+
+
+    /* ---------------------------------------------------
+       INCOMES
+    --------------------------------------------------- */
 
     const incomes = [];
+
+    let incomeTotal = 0;
+
+
+    /*
+      Започваме от реда СЛЕД заглавието.
+      Четем до края на таблицата.
+
+      Празните редове не пречат.
+    */
+
+    for (
+      let i = incomeHeaderRow + 1;
+      i < rows.length;
+      i++
+    ) {
+
+      const row = rows[i] || [];
+
+
+      const date =
+        clean(row[incomeDateCol]);
+
+
+      const description =
+        clean(row[incomeDescriptionCol]);
+
+
+      const amount =
+        numberValue(row[incomeAmountCol]);
+
+
+      const payment =
+        clean(row[paymentMethodCol]);
+
+
+      const status =
+        clean(row[statusCol]);
+
+
+      /*
+        Ако редът е напълно празен,
+        не го добавяме.
+      */
+
+      if (
+        !date &&
+        !description &&
+        !payment &&
+        !status &&
+        amount === 0
+      ) {
+        continue;
+      }
+
+
+      /*
+        Спираме, ако случайно стигнем
+        до началото на друга секция.
+      */
+
+      if (
+        normalize(date) === "дата на разход"
+      ) {
+        break;
+      }
+
+
+      incomes.push({
+
+        date,
+        description,
+        amount,
+        payment,
+        status
+
+      });
+
+
+      if (amount !== 0) {
+        incomeTotal += amount;
+      }
+    }
+
+
+    /* ---------------------------------------------------
+       EXPENSES
+    --------------------------------------------------- */
+
     const expenses = [];
 
-    // Приходи – редове 14–43
-    for (let i = 13; i <= 42; i++) {
+    let expenseTotal = 0;
+
+
+    for (
+      let i = expenseHeaderRow + 1;
+      i < rows.length;
+      i++
+    ) {
 
       const row = rows[i] || [];
 
-      const date = clean(row[0]);
-      const description = clean(row[1]);
-      const amount = numberValue(row[2]);
-      const payment = clean(row[3]);
-      const status = clean(row[4]);
 
-      if (description || amount || date || payment || status) {
+      const date =
+        clean(row[expenseDateCol]);
 
-        if (amount !== 0) {
-          incomeTotal += amount;
-        }
 
-        incomes.push({
-          date,
-          description,
-          amount,
-          payment,
-          status
-        });
+      const reason =
+        clean(row[expenseReasonCol]);
+
+
+      const amount =
+        numberValue(row[expenseAmountCol]);
+
+
+      if (
+        !date &&
+        !reason &&
+        amount === 0
+      ) {
+        continue;
+      }
+
+
+      expenses.push({
+
+        date,
+        reason,
+        amount
+
+      });
+
+
+      if (amount !== 0) {
+        expenseTotal += amount;
       }
     }
 
-    // Разходи – редове 14–44
-    for (let i = 13; i <= 43; i++) {
 
-      const row = rows[i] || [];
+    /* ---------------------------------------------------
+       BALANCE
 
-      const date = clean(row[6]);
-      const reason = clean(row[7]);
-      const amount = numberValue(row[8]);
+       Наличност =
+       стара наличност
+       + приходи
+       - разходи
+    --------------------------------------------------- */
 
-      if (date || reason || amount) {
+    const balance =
+      openingBalance +
+      incomeTotal -
+      expenseTotal;
 
-        if (amount !== 0) {
-          expenseTotal += amount;
-        }
 
-        expenses.push({
-          date,
-          reason,
-          amount
-        });
-      }
-    }
+    /* ---------------------------------------------------
+       PAID / TOTAL
 
-    const balance = openingBalance + incomeTotal - expenseTotal;
+       БРОИМ САМО СТАТУСИТЕ.
 
-    const paidCount = incomes.filter(
-      item => item.status.toLowerCase() === "платена"
-    ).length;
+       "Платена" = платил
+       "Неплатена" = не е платил
 
-    const totalPeople = incomes.filter(
-      item => item.status !== ""
-    ).length;
+       Начинът на плащане НЕ влияе.
+    --------------------------------------------------- */
+
+    const paidCount =
+      incomes.filter(
+        item =>
+          normalize(item.status) === "платена"
+      ).length;
+
+
+    const totalPeople =
+      incomes.filter(
+        item =>
+          normalize(item.status) === "платена" ||
+          normalize(item.status) === "неплатена"
+      ).length;
+
+
+    /* ---------------------------------------------------
+       HTML
+    --------------------------------------------------- */
 
     let html = "";
 
+
+    /* CARDS */
+
     html += `
+
       <div class="cards">
 
         <div class="card">
-          <div class="card-title">🏦 Наличност от миналата година</div>
-          <div class="card-value">${euro(openingBalance)}</div>
+
+          <div class="card-title">
+            🏦 Наличност от миналата година
+          </div>
+
+          <div class="card-value">
+            ${euro(openingBalance)}
+          </div>
+
         </div>
 
-        <div class="card">
-          <div class="card-title">💰 Общо приходи</div>
-          <div class="card-value">${euro(incomeTotal)}</div>
-        </div>
 
         <div class="card">
-          <div class="card-title">🧾 Общо разходи</div>
-          <div class="card-value">${euro(expenseTotal)}</div>
+
+          <div class="card-title">
+            💰 Общо приходи
+          </div>
+
+          <div class="card-value">
+            ${euro(incomeTotal)}
+          </div>
+
         </div>
 
+
         <div class="card">
-          <div class="card-title">💶 Наличност</div>
-          <div class="card-value">${euro(balance)}</div>
+
+          <div class="card-title">
+            🧾 Общо разходи
+          </div>
+
+          <div class="card-value">
+            ${euro(expenseTotal)}
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="card-title">
+            💶 Наличност
+          </div>
+
+          <div class="card-value">
+            ${euro(balance)}
+          </div>
+
         </div>
 
       </div>
     `;
 
+
+    /* PAID */
+
     html += `
+
       <div class="section paid">
-        <h2>👨‍👩‍👧‍👦 Такси</h2>
-        <div class="card-value">${paidCount}/${totalPeople} платили</div>
+
+        <h2>
+          👨‍👩‍👧‍👦 Такси
+        </h2>
+
+        <div class="card-value">
+          ${paidCount}/${totalPeople} платили
+        </div>
+
       </div>
+
     `;
 
+
+    /* INCOMES */
+
     html += `
+
       <div class="section">
-        <h2>Приходи</h2>
+
+        <h2>
+          Приходи
+        </h2>
 
         ${
           incomes.length === 0
-          ? `<div class="empty">Няма въведени приходи.</div>`
-          : `
+
+          ?
+
+          `
+            <div class="empty">
+              Няма въведени приходи.
+            </div>
+          `
+
+          :
+
+          `
+
             <table>
+
               <thead>
+
                 <tr>
-                  <th>Дата</th>
-                  <th>Описание</th>
-                  <th class="amount">Приход</th>
-                  <th>Начин на плащане</th>
-                  <th>Статус</th>
+
+                  <th>
+                    Дата
+                  </th>
+
+                  <th>
+                    Описание
+                  </th>
+
+                  <th class="amount">
+                    Приход
+                  </th>
+
+                  <th>
+                    Начин на плащане
+                  </th>
+
+                  <th>
+                    Статус
+                  </th>
+
                 </tr>
+
               </thead>
+
 
               <tbody>
 
-                ${incomes.map(item => `
-                  <tr>
-                    <td>${item.date}</td>
-                    <td>${item.description}</td>
-                    <td class="amount">
-                      ${item.amount ? euro(item.amount) : ""}
-                    </td>
-                    <td>${item.payment}</td>
-                    <td>${item.status}</td>
-                  </tr>
-                `).join("")}
+                ${
+                  incomes.map(item => `
+
+                    <tr>
+
+                      <td>
+                        ${item.date}
+                      </td>
+
+                      <td>
+                        ${item.description}
+                      </td>
+
+                      <td class="amount">
+                        ${
+                          item.amount
+                            ? euro(item.amount)
+                            : ""
+                        }
+                      </td>
+
+                      <td>
+                        ${item.payment}
+                      </td>
+
+                      <td>
+                        ${item.status}
+                      </td>
+
+                    </tr>
+
+                  `).join("")
+                }
 
               </tbody>
+
             </table>
+
           `
         }
+
       </div>
+
     `;
 
+
+    /* EXPENSES */
+
     html += `
+
       <div class="section">
-        <h2>Разходи</h2>
+
+        <h2>
+          Разходи
+        </h2>
 
         ${
           expenses.length === 0
-          ? `<div class="empty">Няма въведени разходи.</div>`
-          : `
+
+          ?
+
+          `
+            <div class="empty">
+              Няма въведени разходи.
+            </div>
+          `
+
+          :
+
+          `
+
             <table>
+
               <thead>
+
                 <tr>
-                  <th>Дата</th>
-                  <th>Основание</th>
-                  <th class="amount">Разход</th>
+
+                  <th>
+                    Дата
+                  </th>
+
+                  <th>
+                    Основание
+                  </th>
+
+                  <th class="amount">
+                    Разход
+                  </th>
+
                 </tr>
+
               </thead>
+
 
               <tbody>
 
-                ${expenses.map(item => `
-                  <tr>
-                    <td>${item.date}</td>
-                    <td>${item.reason}</td>
-                    <td class="amount">
-                      ${item.amount ? euro(item.amount) : ""}
-                    </td>
-                  </tr>
-                `).join("")}
+                ${
+                  expenses.map(item => `
+
+                    <tr>
+
+                      <td>
+                        ${item.date}
+                      </td>
+
+                      <td>
+                        ${item.reason}
+                      </td>
+
+                      <td class="amount">
+                        ${
+                          item.amount
+                            ? euro(item.amount)
+                            : ""
+                        }
+                      </td>
+
+                    </tr>
+
+                  `).join("")
+                }
 
               </tbody>
+
             </table>
+
           `
         }
+
       </div>
+
     `;
+
 
     content.innerHTML = html;
 
+
   } catch (error) {
 
-    content.innerHTML = `
-      <div class="error">
-        Данните не могат да бъдат заредени в момента.
-        Моля, опитайте отново след малко.
-      </div>
-    `;
-
     console.error(error);
+
+    content.innerHTML = `
+
+      <div class="error">
+
+        Данните не могат да бъдат заредени
+        в момента.
+
+        <br><br>
+
+        Проверете дали Google Sheet
+        е публикуван в мрежата.
+
+      </div>
+
+    `;
   }
 }
+
+
+/* START */
 
 loadData();
 
