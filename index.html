@@ -1,88 +1,467 @@
+```html
 <!doctype html>
 <html lang="bg">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Каса – 4 група</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f7fb;color:#172033}
-.wrap{max-width:1000px;margin:0 auto;padding:28px 16px 48px}
-h1{margin:0 0 6px;font-size:28px}
-.sub{margin:0 0 22px;color:#667085}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.label{font-size:13px;color:#667085;margin-bottom:6px}
-.value{font-size:24px;font-weight:700}
-.toolbar{display:flex;gap:10px;margin-bottom:12px}
-input{width:100%;padding:12px 14px;border:1px solid #d0d5dd;border-radius:10px;font-size:15px;background:#fff}
-.tablebox{background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.scroller{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:620px}
-th,td{padding:12px 14px;border-bottom:1px solid #eef0f3;text-align:left}
-th{background:#f9fafb;font-size:13px;color:#475467;position:sticky;top:0}
-td.num,th.num{text-align:right}
-tbody tr:hover{background:#fafcff}
-.footer{margin-top:14px;font-size:12px;color:#667085}
-@media(max-width:700px){.cards{grid-template-columns:1fr}.wrap{padding-top:20px}h1{font-size:24px}}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f5f7fb;
+  color:#172033
+}
+
+.wrap{
+  max-width:1000px;
+  margin:0 auto;
+  padding:28px 16px 48px
+}
+
+h1{
+  margin:0 0 6px;
+  font-size:28px
+}
+
+.sub{
+  margin:0 0 22px;
+  color:#667085
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:18px
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,.04)
+}
+
+.label{
+  font-size:13px;
+  color:#667085;
+  margin-bottom:6px
+}
+
+.value{
+  font-size:24px;
+  font-weight:700
+}
+
+.tablebox{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,.04)
+}
+
+.scroller{
+  overflow-x:auto
+}
+
+table{
+  width:100%;
+  border-collapse:collapse
+}
+
+th,td{
+  padding:12px 14px;
+  border-bottom:1px solid #eef0f3;
+  text-align:left
+}
+
+th{
+  background:#f9fafb;
+  font-size:13px;
+  color:#475467
+}
+
+td.num,
+th.num{
+  text-align:right
+}
+
+tbody tr:hover{
+  background:#fafcff
+}
+
+.message{
+  padding:18px;
+  text-align:center;
+  color:#667085
+}
+
+.error{
+  color:#b42318;
+  background:#fef3f2;
+  border:1px solid #fecdca;
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:18px
+}
+
+.footer{
+  margin-top:14px;
+  font-size:12px;
+  color:#667085
+}
+
+@media(max-width:700px){
+  .cards{
+    grid-template-columns:1fr
+  }
+
+  .wrap{
+    padding-top:20px
+  }
+
+  h1{
+    font-size:24px
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
+
   <h1>Каса – 4 група</h1>
-  <p class="sub">Информационна таблица · само за преглед</p>
+
+  <p class="sub">
+    Информационна таблица · само за преглед
+  </p>
+
+  <div id="error"></div>
 
   <div class="cards">
-    <div class="card"><div class="label">Общо приходи</div><div class="value" id="income"></div></div>
-    <div class="card"><div class="label">Общо разходи</div><div class="value" id="expense"></div></div>
-    <div class="card"><div class="label">Налични</div><div class="value" id="balance"></div></div>
-  </div>
 
-  <div class="toolbar">
-    <input id="search" type="search" placeholder="Търси по номер или описание…" aria-label="Търси">
+    <div class="card">
+      <div class="label">Общо приходи</div>
+      <div class="value" id="income">Зареждане...</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Общо разходи</div>
+      <div class="value" id="expense">Зареждане...</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Налични</div>
+      <div class="value" id="balance">Зареждане...</div>
+    </div>
+
   </div>
 
   <div class="tablebox">
+
     <div class="scroller">
+
       <table>
-        <thead><tr>
-          <th>Номер</th>
-          <th class="num">Приходи</th>
-          <th class="num">Разходи</th>
-          <th>Описание</th>
-        </tr></thead>
-        <tbody id="body"></tbody>
+
+        <thead>
+          <tr>
+            <th>Основание</th>
+            <th class="num">Сума</th>
+          </tr>
+        </thead>
+
+        <tbody id="body">
+          <tr>
+            <td colspan="2" class="message">
+              Зареждане на данните...
+            </td>
+          </tr>
+        </tbody>
+
       </table>
+
     </div>
+
   </div>
-  <div class="footer">Страницата е само за преглед. Посетителите не могат да редактират таблицата.</div>
+
+  <div class="footer">
+    Страницата е само за преглед. Посетителите не могат да редактират таблицата.
+  </div>
+
 </div>
 
+
+<!-- SheetJS -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+
 <script>
-const rows = [{"Номер": "1", "Приходи": null, "Разходи": 67.5, "Описание": "застраховки"}, {"Номер": "2", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "3", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "4", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "5", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "6", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "7", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "8", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "9", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "10", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "11", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "12", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "13", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "14", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "15", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "16", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "17", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "18", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "19", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "20", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "21", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "22", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "23", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "24", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "25", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "26", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "27", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "28", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "29", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "30", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "31", "Приходи": 139.31, "Разходи": null, "Описание": ""}];
-const totals = {"income": 689.31, "expense": 67.5, "balance": 621.81};
-const money = n => n == null ? "—" : new Intl.NumberFormat("bg-BG",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n) + " €";
 
-document.getElementById("income").textContent = money(totals.income);
-document.getElementById("expense").textContent = money(totals.expense);
-document.getElementById("balance").textContent = money(totals.balance);
+const EXCEL_FILE = "каса_4група.xlsx";
 
-function render(list){
-  const body = document.getElementById("body");
-  body.innerHTML = list.map(r => `
-    <tr>
-      <td>${r.Номер ?? "—"}</td>
-      <td class="num">${money(r.Приходи)}</td>
-      <td class="num">${money(r.Разходи)}</td>
-      <td>${r.Описание || "—"}</td>
-    </tr>`).join("");
+const money = value => {
+
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+
+  const number = Number(value);
+
+  if (Number.isNaN(number)) {
+    return "—";
+  }
+
+  return new Intl.NumberFormat("bg-BG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(number) + " €";
+};
+
+
+async function loadExcel(){
+
+  try {
+
+    /*
+      Зареждаме Excel файла от същото GitHub
+      repository, в което е index.html.
+    */
+    const response = await fetch(
+      EXCEL_FILE + "?v=" + Date.now()
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Excel файлът не може да бъде намерен."
+      );
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+
+    /*
+      SheetJS прочита Excel файла.
+    */
+    const workbook = XLSX.read(arrayBuffer);
+
+    /*
+      Използваме първия лист от Excel файла.
+    */
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+
+    /*
+      ==========================================
+      ОБЩО ПРИХОДИ
+      Excel клетка B35
+      ==========================================
+    */
+    const incomeCell = sheet["B35"];
+
+    const income =
+      incomeCell ? incomeCell.v : null;
+
+
+    /*
+      ==========================================
+      НАЛИЧНИ
+      Excel клетка B36
+      ==========================================
+    */
+    const balanceCell = sheet["B36"];
+
+    const balance =
+      balanceCell ? balanceCell.v : null;
+
+
+    /*
+      ==========================================
+      РАЗХОДИ
+      C2:C34
+      ОСНОВАНИЕ
+      D2:D34
+      ==========================================
+    */
+
+    const expenses = [];
+
+    for(let row = 2; row <= 34; row++){
+
+      const expenseCell = sheet["C" + row];
+      const descriptionCell = sheet["D" + row];
+
+      const expense =
+        expenseCell ? expenseCell.v : null;
+
+      const description =
+        descriptionCell ? descriptionCell.v : "";
+
+      /*
+        Показваме само редовете,
+        в които има стойност за разход.
+      */
+      if(
+        expense !== null &&
+        expense !== undefined &&
+        expense !== "" &&
+        Number(expense) !== 0
+      ){
+
+        expenses.push({
+          description:
+            description !== null &&
+            description !== undefined &&
+            description !== ""
+              ? String(description)
+              : "Без описание",
+
+          amount: Number(expense)
+        });
+
+      }
+
+    }
+
+
+    /*
+      ==========================================
+      ПОКАЗВАМЕ ОБЩО ПРИХОДИ
+      ==========================================
+    */
+
+    document.getElementById("income").textContent =
+      money(income);
+
+
+    /*
+      ==========================================
+      ОБЩО РАЗХОДИ
+      Сумираме C2:C34
+      ==========================================
+    */
+
+    const totalExpense =
+      expenses.reduce(
+        (sum, item) => sum + item.amount,
+        0
+      );
+
+    document.getElementById("expense").textContent =
+      money(totalExpense);
+
+
+    /*
+      ==========================================
+      ПОКАЗВАМЕ B36 - НАЛИЧНИ
+      ==========================================
+    */
+
+    document.getElementById("balance").textContent =
+      money(balance);
+
+
+    /*
+      ==========================================
+      ПОКАЗВАМЕ РАЗХОДИТЕ
+      ==========================================
+    */
+
+    const body =
+      document.getElementById("body");
+
+
+    if(expenses.length === 0){
+
+      body.innerHTML = `
+        <tr>
+          <td colspan="2" class="message">
+            Няма въведени разходи.
+          </td>
+        </tr>
+      `;
+
+      return;
+    }
+
+
+    body.innerHTML =
+      expenses.map(item => `
+
+        <tr>
+
+          <td>
+            ${escapeHtml(item.description)}
+          </td>
+
+          <td class="num">
+            ${money(item.amount)}
+          </td>
+
+        </tr>
+
+      `).join("");
+
+
+  } catch(error){
+
+    console.error(error);
+
+    document.getElementById("income").textContent = "—";
+    document.getElementById("expense").textContent = "—";
+    document.getElementById("balance").textContent = "—";
+
+    document.getElementById("body").innerHTML = `
+      <tr>
+        <td colspan="2" class="message">
+          Данните не могат да бъдат заредени.
+        </td>
+      </tr>
+    `;
+
+    document.getElementById("error").innerHTML = `
+      <div class="error">
+        Excel файлът не може да бъде зареден.
+        Провери дали името му е точно:
+        <strong>${EXCEL_FILE}</strong>
+      </div>
+    `;
+
+  }
+
 }
-render(rows);
 
-document.getElementById("search").addEventListener("input", e => {
-  const q = e.target.value.trim().toLowerCase();
-  render(rows.filter(r => [r.Номер, r.Описание].join(" ").toLowerCase().includes(q)));
-});
+
+/*
+  Защита при показване на текст
+  от Excel файла.
+*/
+function escapeHtml(value){
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+/*
+  Стартираме зареждането.
+*/
+loadExcel();
+
 </script>
+
 </body>
 </html>
+```
