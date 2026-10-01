@@ -1,131 +1,88 @@
-```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bg">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Каса – 4 група</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-      color: #222;
-    }
-
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
-
-    h1 {
-      text-align: center;
-      margin: 0;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #777;
-      margin-top: 6px;
-      margin-bottom: 30px;
-    }
-
-    .income {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .income-title {
-      font-size: 18px;
-      color: #555;
-    }
-
-    .income-value {
-      font-size: 32px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    h2 {
-      margin-top: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    th,
-    td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background: #f7f7f7;
-      text-align: left;
-    }
-
-    th:last-child,
-    td:last-child {
-      text-align: right;
-    }
-
-    .total {
-      display: flex;
-      justify-content: space-between;
-      font-weight: bold;
-      border-top: 2px solid #222;
-      margin-top: 10px;
-      padding: 15px 10px;
-    }
-
-    .available {
-      margin-top: 30px;
-      padding: 25px;
-      background: #eef8ee;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .available-title {
-      font-size: 20px;
-    }
-
-    .available-value {
-      font-size: 40px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    .footer {
-      margin-top: 30px;
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каса – 4 група</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f7fb;color:#172033}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 16px 48px}
+h1{margin:0 0 6px;font-size:28px}
+.sub{margin:0 0 22px;color:#667085}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.label{font-size:13px;color:#667085;margin-bottom:6px}
+.value{font-size:24px;font-weight:700}
+.toolbar{display:flex;gap:10px;margin-bottom:12px}
+input{width:100%;padding:12px 14px;border:1px solid #d0d5dd;border-radius:10px;font-size:15px;background:#fff}
+.tablebox{background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.scroller{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{padding:12px 14px;border-bottom:1px solid #eef0f3;text-align:left}
+th{background:#f9fafb;font-size:13px;color:#475467;position:sticky;top:0}
+td.num,th.num{text-align:right}
+tbody tr:hover{background:#fafcff}
+.footer{margin-top:14px;font-size:12px;color:#667085}
+@media(max-width:700px){.cards{grid-template-columns:1fr}.wrap{padding-top:20px}h1{font-size:24px}}
+</style>
 </head>
-
 <body>
-
-<div class="container">
-
+<div class="wrap">
   <h1>Каса – 4 група</h1>
+  <p class="sub">Информационна таблица · само за преглед</p>
 
-  <div class="subtitle">
-    Информационна таблица · само за преглед
+  <div class="cards">
+    <div class="card"><div class="label">Общо приходи</div><div class="value" id="income"></div></div>
+    <div class="card"><div class="label">Общо разходи</div><div class="value" id="expense"></div></div>
+    <div class="card"><div class="label">Налични</div><div class="value" id="balance"></div></div>
   </div>
 
-  <!-- B35 – ОБЩО ПРИХОДИ -->
-  <div class="income">
-    <div class="income
-```
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Търси по номер или описание…" aria-label="Търси">
+  </div>
+
+  <div class="tablebox">
+    <div class="scroller">
+      <table>
+        <thead><tr>
+          <th>Номер</th>
+          <th class="num">Приходи</th>
+          <th class="num">Разходи</th>
+          <th>Описание</th>
+        </tr></thead>
+        <tbody id="body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="footer">Страницата е само за преглед. Посетителите не могат да редактират таблицата.</div>
+</div>
+
+<script>
+const rows = [{"Номер": "1", "Приходи": null, "Разходи": 67.5, "Описание": "застраховки"}, {"Номер": "2", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "3", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "4", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "5", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "6", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "7", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "8", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "9", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "10", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "11", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "12", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "13", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "14", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "15", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "16", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "17", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "18", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "19", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "20", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "21", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "22", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "23", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "24", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "25", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "26", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "27", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "28", "Приходи": 50.0, "Разходи": null, "Описание": ""}, {"Номер": "29", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "30", "Приходи": null, "Разходи": null, "Описание": ""}, {"Номер": "31", "Приходи": 139.31, "Разходи": null, "Описание": ""}];
+const totals = {"income": 689.31, "expense": 67.5, "balance": 621.81};
+const money = n => n == null ? "—" : new Intl.NumberFormat("bg-BG",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n) + " лв.";
+
+document.getElementById("income").textContent = money(totals.income);
+document.getElementById("expense").textContent = money(totals.expense);
+document.getElementById("balance").textContent = money(totals.balance);
+
+function render(list){
+  const body = document.getElementById("body");
+  body.innerHTML = list.map(r => `
+    <tr>
+      <td>${r.Номер ?? "—"}</td>
+      <td class="num">${money(r.Приходи)}</td>
+      <td class="num">${money(r.Разходи)}</td>
+      <td>${r.Описание || "—"}</td>
+    </tr>`).join("");
+}
+render(rows);
+
+document.getElementById("search").addEventListener("input", e => {
+  const q = e.target.value.trim().toLowerCase();
+  render(rows.filter(r => [r.Номер, r.Описание].join(" ").toLowerCase().includes(q)));
+});
+</script>
+</body>
+</html>
